@@ -1,0 +1,129 @@
+1. ods
+
+1.1 原始注册用户数据
+create table if not exists ods_release.ods_01_release_users (
+user_id string COMMENT '用户id：手机号',
+ctime bigint COMMENT '创建时间'
+)
+partitioned by (bdp_day string)
+stored as parquet
+location '/data/release/ods/release_user/'
+;
+
+1.2 物料原始数据
+create external table if not exists ods_release.ods_02_release_materiel (
+matter_id string COMMENT '物料编码',
+matter_type string COMMENT '物料类型：1 图文 2 视频',
+matter_model string COMMENT '物料对应模型',
+matter_model_version string COMMENT '物料对应模型的版本',
+ctime bigint COMMENT '创建时间'
+)
+partitioned by (bdp_day string)
+stored as parquet
+location '/data/release/ods/release_materiel/';
+
+1.3 渠道通道原始数据
+create table if not exists ods_release.ods_02_release_sources_channels (
+sources string COMMENT '渠道编码',
+sources_remark string COMMENT '渠道描述',
+channels string COMMENT '通道编码',
+channels_remark string COMMENT '通道描述',
+media_type string COMMENT '媒体类型',
+media_type_remark string COMMENT '媒体类型描述',
+ctime bigint COMMENT '创建时间'
+)
+partitioned by (bdp_day string)
+stored as parquet
+location '/data/release/ods/release_sources_channels/';
+
+2. dw
+
+2.1注册主题用户表
+create table if not exists dw_release.dw_release_users (
+user_id string COMMENT '用户id：手机号',
+matter_id string COMMENT '物料代码',
+model_code string COMMENT '模型代码',
+model_version string COMMENT '模型版本',
+sid string COMMENT '投放请求id',
+device_type string COMMENT '1 android| 2 ios | 9 其他',
+release_status string COMMENT '只关注曝光-注册：03-06',
+sources string COMMENT '渠道',
+channels string COMMENT '通道',
+idcard string COMMENT '身份证',
+age int COMMENT '年龄',
+gender string COMMENT '性别',
+aid string COMMENT '广告位id',
+ctime bigint COMMENT '创建时间'
+)
+partitioned by (bdp_day string)
+stored as parquet
+location '/data/release/dw/release_user/'
+;
+
+3. dim
+
+3.1 dim_release.date_dim（时间维度）
+create table if not exists dim_release.date_dim (
+date_dim_id string COMMENT '时间维度id',
+date string COMMENT '日期',
+week string COMMENT '周',
+month string COMMENT '月',
+season string COMMENT '季度',
+year string COMMENT '年',
+ctime bigint COMMENT '创建时间',
+etime bigint COMMENT '有效时间至',
+version string COMMENT '版本'
+)
+stored as parquet
+location '/data/release/dim/date_dim/'
+;
+
+3.2 dim_release.region_dim（区域维度）
+create table if not exists dim_release.region_dim (
+region_dim_id string COMMENT '地域维度id',
+province string COMMENT '省',
+city string COMMENT '市',
+area string COMMENT '区',
+ctime bigint COMMENT '创建时间',
+etime bigint COMMENT '有效时间至',
+version string COMMENT '版本'
+)
+stored as parquet
+location '/data/release/dim/region_dim/'
+; 
+
+3.3 dim_release.sources_mapping_channels（渠道和通道映射关系）
+create table if not exists dim_release.sources_mapping_channels (
+smc_dim_id string COMMENT '渠道通道映射id',
+sources string COMMENT '渠道',
+channels string COMMENT '通道',
+ctime bigint COMMENT '创建时间',
+etime bigint COMMENT '有效时间至',
+version string COMMENT '版本'
+)
+stored as parquet
+location '/data/release/dim/sources_mapping_channels/'
+;
+
+4 集市注册用户库表
+create external table if not exists dm_release.dm_release_user(
+date_dim_id string COMMENT '时间维度id',
+region_dim_id string COMMENT '地域维度id',
+smc_dim_id string COMMENT '渠道通道映射id',
+sources string comment '渠道',
+channels string comment '通道',
+device_type string comment '1 android| 2 ios | 9 其他',
+new_user_count bigint comment '新增用户数量',
+new_user_total_count bigint commnet '新增总用户数',
+percent_regist_trans string comment '点击-注册转化率',
+idcard string comment '身份证',
+matter_id string comment '物料代码',
+model_code string comment '模型代码',
+model_version string comment '模型版本',
+aid string comment '广告位id',
+ct bigint comment '创建时间'
+) 
+partitioned by (bdp_day string)
+stored as parquet
+location '/data/release/dm/release_user/'
+

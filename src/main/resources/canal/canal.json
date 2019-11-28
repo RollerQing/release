@@ -1,0 +1,15 @@
+[
+  {
+    "canalModel":9,
+    "canalZK":"10.0.88.242:2181,10.0.88.243:2181,10.0.88.244:2181",
+    "canalDestination":"test",
+    "canalExceptionStrategy":1,
+    "canalRetryTimes":3,
+    "canalUser":"",
+    "canalPass":"",
+    "canalFilter": ".*\\..*",
+    "canalBatchSize":5,
+    "canalHost": "10.0.88.242",
+    "canalPort": "11111"
+  }
+]
